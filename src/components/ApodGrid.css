@@ -1,0 +1,15 @@
+.apod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100vw;
+  height: 100dvh; /* dynamic viewport height — handles mobile browser bars */
+  overflow: hidden;
+  gap: 0;
+}
+
+/* Thin separator lines between cells */
+.apod-grid > * {
+  outline: 1px solid rgba(255, 255, 255, 0.06);
+  outline-offset: -1px;
+}

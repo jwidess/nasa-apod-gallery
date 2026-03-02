@@ -1,0 +1,146 @@
+.apod-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.apod-card--clickable {
+  cursor: pointer;
+}
+
+/* Transparent shield sits on top of iframes so clicks reach the card div,
+   not the iframe (which would steal the event). */
+.apod-card__click-shield {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Overlays need to sit above the click shield */
+.overlay {
+  z-index: 2;
+}
+
+/* ── Image ─────────────────────────────────────────────── */
+
+.apod-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.apod-image--cover {
+  object-fit: cover;
+  object-position: center;
+}
+
+.apod-image--contain {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* ── Video (YouTube iframe + HTML5 video) ───────────────── */
+
+.apod-card--video {
+  background: #000;
+}
+
+.apod-video {
+  /* Oversized + centred to hide YouTube letterboxing/chrome */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  border: none;
+  pointer-events: none; /* prevent user interaction — click-shield / card div handles clicks */
+}
+
+/* HTML5 <video> uses object-fit instead of iframe oversizing */
+.apod-video--html5 {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* ── Play indicator (non-YouTube video fallback) ─────────── */
+
+.play-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+/* ── Info overlay ────────────────────────────────────────── */
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 28px 14px 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.82));
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: opacity 0.35s ease;
+}
+
+.overlay--none {
+  display: none;
+}
+
+.overlay--hover {
+  opacity: 0;
+}
+
+.apod-card:hover .overlay--hover {
+  opacity: 1;
+}
+
+.overlay--always {
+  opacity: 1;
+}
+
+/* ── Overlay content ─────────────────────────────────────── */
+
+.overlay__badge {
+  display: inline-block;
+  align-self: flex-start;
+  background: rgba(56, 143, 230, 0.92);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+}
+
+.overlay__title {
+  color: #fff;
+  font-size: clamp(0.65rem, 1.1vw, 0.95rem);
+  font-weight: 600;
+  line-height: 1.3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.overlay__date {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: clamp(0.55rem, 0.9vw, 0.75rem);
+}
+
+.overlay__copyright {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: clamp(0.5rem, 0.8vw, 0.68rem);
+}

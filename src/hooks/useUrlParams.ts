@@ -1,0 +1,48 @@
+export type OverlayMode = 'always' | 'hover' | 'none';
+export type FitMode = 'cover' | 'contain';
+
+export interface UrlParams {
+  /** NASA API key — defaults to DEMO_KEY */
+  apiKey: string;
+  /** Auto-refresh interval in seconds. 0 = disabled. */
+  refreshInterval: number;
+  /** Controls when the info overlay is visible */
+  overlay: OverlayMode;
+  /** CSS object-fit for images */
+  fit: FitMode;
+}
+
+/**
+ * Reads display/behaviour config from the page URL query string.
+ *
+ * Supported parameters:
+ *   ?api_key=YOUR_KEY        — NASA API key (default: DEMO_KEY)
+ *   &refresh=3600            — auto-refresh every N seconds (default: 0, off)
+ *   &overlay=always|hover|none  — info overlay visibility (default: always)
+ *   &fit=cover|contain       — image scaling (default: cover)
+ *
+ * Example:
+ *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
+ */
+export function useUrlParams(): UrlParams {
+  const params = new URLSearchParams(window.location.search);
+
+  const apiKey = params.get('api_key') || 'DEMO_KEY';
+
+  const refreshRaw = params.get('refresh');
+  const refreshInterval =
+    refreshRaw !== null && !isNaN(Number(refreshRaw))
+      ? Math.max(0, parseInt(refreshRaw, 10))
+      : 0;
+
+  const overlayRaw = params.get('overlay');
+  const overlay: OverlayMode =
+    overlayRaw === 'hover' || overlayRaw === 'none' || overlayRaw === 'always'
+      ? overlayRaw
+      : 'always';
+
+  const fitRaw = params.get('fit');
+  const fit: FitMode = fitRaw === 'contain' ? 'contain' : 'cover';
+
+  return { apiKey, refreshInterval, overlay, fit };
+}
