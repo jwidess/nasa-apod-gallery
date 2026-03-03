@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { ApodItem } from '../types/apod';
 import { getGridImageProps } from '../types/apod';
 import type { OverlayMode, FitMode } from '../hooks/useUrlParams';
@@ -40,6 +41,21 @@ export default function ApodCard({
   isPrimary = false,
   onOpen,
 }: ApodCardProps) {
+  // Detect GIFs so we can restart them periodically (every 15s)
+  const isGif = item.media_type === 'image' && /\.gif(\?.*)?$/i.test(item.url);
+  const gifImgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (!isGif) return;
+    const id = setInterval(() => {
+      const img = gifImgRef.current;
+      if (!img) return;
+      const src = img.src;
+      img.src = '';
+      img.src = src;
+    }, 15_000);
+    return () => clearInterval(id);
+  }, [isGif]);
   const overlayClass =
     overlay === 'hover'
       ? 'overlay overlay--hover'
@@ -143,6 +159,7 @@ export default function ApodCard({
   return (
     <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen} title="Click for details">
       <img
+        ref={isGif ? gifImgRef : undefined}
         src={imgSrc}
         srcSet={imgSrcSet}
         alt={item.title}
