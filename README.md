@@ -5,7 +5,7 @@ A full page 2x2 grid gallery of NASA [Astronomy Picture of the Day](https://apod
 - **Top-left cell** shows today's APOD
 - **Other cells** show randomly selected past APODs
 - Grid scales dynamically to any display size or aspect ratio
-- Videos (YouTube embeds) play muted and looping
+- Videos play muted and looping
 - Configurable via URL parameters
 
 ## Live Demo
@@ -18,15 +18,15 @@ A full page 2x2 grid gallery of NASA [Astronomy Picture of the Day](https://apod
 
 ## URL Parameters
 
-All parameters are optional. Combine them freely:
+All parameters are optional, however an API key is required to avoid rate limits.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `api_key` | `DEMO_KEY` | Your [NASA API key](https://api.nasa.gov/#signUp). `DEMO_KEY` is rate-limited to 30 req/hr and 50 req/day per IP. |
 | `refresh` | `0` (off) | Auto-refresh interval in **seconds**. `0` disables auto-refresh. Minimum `10` when non-zero. Note: if `cache` TTL is longer than this interval, refreshes will serve the cached data until the TTL expires. |
-| `overlay` | `always` | Info overlay visibility: `always`, `hover`, or `none` |
+| `overlay` | `always` | Text info overlay visibility: `always`, `hover`, or `none` |
 | `fit` | `cover` | Image scaling: `cover` (fill cell, may crop) or `contain` (full image, black bars) |
-| `cache` | `3600` | localStorage cache TTL in **seconds**. Skips NASA API calls on page reload if the cache is fresh. `0` disables caching. Minimum `10` when non-zero. Cache is also invalidated when the UTC date changes (new day = new APOD). |
+| `cache` | `3600` | localStorage cache TTL in **seconds**. Skips API calls on page reload if the cache is fresh. `0` disables caching. Minimum `10` when non-zero. Cache is also invalidated when the UTC date changes (new day = new APOD). |
 | `text_scale` | `1.0` | Overlay text size multiplier. `1.5` = 50% larger, `2.0` = double size, etc. Clamped to `0.5`–`4.0`. Useful for large TVs or high DPI displays. |
 
 ### Examples
