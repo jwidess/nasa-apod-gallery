@@ -4,6 +4,7 @@
   height: 100%;
   overflow: hidden;
   background: #000;
+  user-select: none;
 }
 
 .apod-card--clickable {
@@ -93,6 +94,7 @@
   flex-direction: column;
   gap: 3px;
   transition: opacity 0.35s ease;
+  user-select: none;
 }
 
 .overlay--none {

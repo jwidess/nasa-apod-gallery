@@ -31,6 +31,7 @@
   overflow: hidden;
   animation: panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  caret-color: transparent;
 }
 
 @keyframes panel-in {
@@ -58,6 +59,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s, color 0.15s;
+  user-select: none;
 }
 
 .modal-close:hover {
@@ -77,6 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }
 
 .modal-media__img {
@@ -183,6 +186,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 12px;
+  user-select: none;
 }
 
 .modal-link {
