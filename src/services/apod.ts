@@ -88,6 +88,11 @@ export async function fetchTodayApod(apiKey: string): Promise<ApodItem> {
  * Fetch N randomly selected past APODs (array response).
  */
 export async function fetchRandomApods(apiKey: string, count: number): Promise<ApodItem[]> {
+  if (count <= 0) {
+    console.log('[APOD] fetchRandomApods skipped (count <= 0)');
+    return [];
+  }
+
   const url = `${BASE_URL}?api_key=${encodeURIComponent(apiKey)}&count=${count}&thumbs=true`;
   console.log(`[APOD] Fetching ${count} random APODs →`, url.replace(encodeURIComponent(apiKey), '<api_key>'));
   const t0 = performance.now();

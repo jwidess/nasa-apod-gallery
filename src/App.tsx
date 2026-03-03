@@ -46,6 +46,18 @@ export default function App() {
     }
 
     try {
+      if (randomsNeeded <= 0) {
+        // Only todays APOD required
+        console.log('[APOD][App] 1x1 grid, fetching only today');
+        const today = await fetchTodayApod(apiKey);
+        const next = [today];
+        prevItemsRef.current = next;
+        setItems(next);
+        setLoadState('ready');
+        writeApodCache(next);
+        return;
+      }
+
       const [today, candidates] = await Promise.all([
         fetchTodayApod(apiKey),
         fetchRandomApods(apiKey, randomsNeeded),
