@@ -38,6 +38,35 @@ export function getImageSrc(item: ApodItem): string {
   return item.hdurl ?? item.url;
 }
 
+/**
+ * Returns { src, srcSet? } optimised for grid card <img> elements.
+ *
+ * - `src`    — always the standard `url` (fast load, suitable for small cells).
+ * - `srcSet` — `"<hdurl> 2x"` when hdurl is available, differs from url, and
+ *              is in a browser-renderable format. The browser will automatically
+ *              request the HD image on high-DPI (≥2×) displays.
+ *
+ * Special cases that skip srcSet (same rules as getImageSrc):
+ *  - GIFs: hdurl is a static JPEG snapshot — animation must come from url.
+ *  - Browser-incompatible hdurl formats (TIFF, FITS, etc.).
+ *  - hdurl absent or identical to url.
+ */
+export function getGridImageProps(item: ApodItem): { src: string; srcSet?: string } {
+  const src = item.url;
+
+  const hdurl = item.hdurl;
+  if (
+    !hdurl ||
+    hdurl === src ||
+    /\.gif(\?.*)?$/i.test(src) ||
+    UNSUPPORTED_IMG_EXTS.test(hdurl)
+  ) {
+    return { src };
+  }
+
+  return { src, srcSet: `${hdurl} 2x` };
+}
+
 /** Returns a short uppercase format label for the modal badge, e.g. "JPEG", "GIF", "MP4", "YouTube". */
 export function getMediaFormat(item: ApodItem): string {
   if (item.media_type === 'video') {

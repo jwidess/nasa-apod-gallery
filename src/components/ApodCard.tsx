@@ -1,5 +1,5 @@
 import type { ApodItem } from '../types/apod';
-import { getImageSrc } from '../types/apod';
+import { getGridImageProps } from '../types/apod';
 import type { OverlayMode, FitMode } from '../hooks/useUrlParams';
 import './ApodCard.css';
 
@@ -110,12 +110,13 @@ export default function ApodCard({
   }
 
   // ── Standard image (incl. GIFs) ─────────────────────────
-  const imgSrc = getImageSrc(item);
+  const { src: imgSrc, srcSet: imgSrcSet } = getGridImageProps(item);
 
   return (
     <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen} title="Click for details">
       <img
         src={imgSrc}
+        srcSet={imgSrcSet}
         alt={item.title}
         className={`apod-image apod-image--${fit}`}
         loading="lazy"
