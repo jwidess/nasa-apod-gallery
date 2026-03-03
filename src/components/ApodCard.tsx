@@ -85,7 +85,7 @@ export default function ApodCard({
         `&controls=0&rel=0&modestbranding=1&playsinline=1`;
 
       return (
-        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen} title="Click for details">
+        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen}>
           <iframe
             src={embedSrc}
             title={item.title}
@@ -107,7 +107,7 @@ export default function ApodCard({
         `?autoplay=1&autopause=0&muted=1&loop=1&background=1`;
 
       return (
-        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen} title="Click for details">
+        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen}>
           <iframe
             src={embedSrc}
             title={item.title}
@@ -123,7 +123,7 @@ export default function ApodCard({
     // ── Direct video file (.mp4 / .webm / etc.) ───────────────
     if (isDirectVideoUrl(item.url)) {
       return (
-        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen} title="Click for details">
+        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen}>
           <video
             className="apod-video apod-video--html5"
             src={item.url}
@@ -141,7 +141,7 @@ export default function ApodCard({
     // ── Unrecognised video URL — show thumbnail/fallback ──────
     const fallbackSrc = item.thumbnail_url || item.url;
     return (
-      <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen} title="Click for details">
+      <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen}>
         <img
           src={fallbackSrc}
           alt={item.title}
@@ -157,7 +157,7 @@ export default function ApodCard({
   const { src: imgSrc, srcSet: imgSrcSet } = getGridImageProps(item);
 
   return (
-    <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen} title="Click for details">
+    <div className="apod-card apod-card--image apod-card--clickable" onClick={onOpen}>
       <img
         ref={isGif ? gifImgRef : undefined}
         src={imgSrc}
