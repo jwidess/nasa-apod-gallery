@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUrlParams } from './hooks/useUrlParams';
-import { fetchTodayApod, fetchRandomApods, readApodCache, writeApodCache } from './services/apod';
+import { fetchTodayApod, fetchRandomApods, readTodayCache, writeTodayCache, readRandomsCache, writeRandomsCache } from './services/apod';
 import type { ApodItem } from './types/apod';
 import ApodGrid from './components/ApodGrid';
 import ApodModal from './components/ApodModal';
@@ -35,56 +35,53 @@ export default function App() {
     }
     console.log('[APOD][App] loadApods triggered — apiKey suffix:', apiKey.slice(-4), '— cacheTtl:', cacheTtl);
 
-    // ── Cache read ──────────────────────────────────────────────────
-    const cached = readApodCache(cacheTtl);
-    // Discard cache if it was built for a different grid size
-    if (cached && cached.length === total) {
-      prevItemsRef.current = cached;
-      setItems(cached);
-      setLoadState('ready');
-      return;
-    }
-
     try {
+      // ── Today's APOD — only re-fetched when the APOD date rolls over ────────
+      let today: ApodItem | null = readTodayCache();
+      if (!today) {
+        today = await fetchTodayApod(apiKey);
+        writeTodayCache(today);
+      }
+
       if (randomsNeeded <= 0) {
-        // Only todays APOD required
-        console.log('[APOD][App] 1x1 grid, fetching only today');
-        const today = await fetchTodayApod(apiKey);
+        // 1x1 grid — only today's APOD needed
+        console.log('[APOD][App] 1x1 grid, skipping randoms fetch');
         const next = [today];
         prevItemsRef.current = next;
         setItems(next);
         setLoadState('ready');
-        writeApodCache(next);
         return;
       }
 
-      const [today, candidates] = await Promise.all([
-        fetchTodayApod(apiKey),
-        fetchRandomApods(apiKey, randomsNeeded),
-      ]);
+      // ── Randoms — re-fetched on TTL expiry or APOD date rollover ────────────
+      let randoms: ApodItem[] | null = readRandomsCache(randomsNeeded, cacheTtl);
+      if (!randoms) {
+        const candidates = await fetchRandomApods(apiKey, randomsNeeded);
 
-      // Build a deduplicated list of randomsNeeded items (excluding today)
-      const seen = new Set([today.date]);
-      const randoms: ApodItem[] = [];
-      for (const c of candidates) {
-        if (!seen.has(c.date)) {
-          seen.add(c.date);
-          randoms.push(c);
-        }
-        if (randoms.length === randomsNeeded) break;
-      }
-
-      // If still short, today's date collided with a random, top up
-      if (randoms.length < randomsNeeded) {
-        console.warn(`[APOD][App] Deduplication collision — fetching ${randomsNeeded - randoms.length} extra APODs`);
-        const extra = await fetchRandomApods(apiKey, randomsNeeded);
-        for (const c of extra) {
+        const seen = new Set([today.date]);
+        randoms = [];
+        for (const c of candidates) {
           if (!seen.has(c.date)) {
             seen.add(c.date);
             randoms.push(c);
           }
           if (randoms.length === randomsNeeded) break;
         }
+
+        // If still short, today's date collided with a random, top up
+        if (randoms.length < randomsNeeded) {
+          console.warn(`[APOD][App] Deduplication collision — fetching ${randomsNeeded - randoms.length} extra APODs`);
+          const extra = await fetchRandomApods(apiKey, randomsNeeded);
+          for (const c of extra) {
+            if (!seen.has(c.date)) {
+              seen.add(c.date);
+              randoms.push(c);
+            }
+            if (randoms.length === randomsNeeded) break;
+          }
+        }
+
+        writeRandomsCache(randoms);
       }
 
       const next = [today, ...randoms];
@@ -107,7 +104,6 @@ export default function App() {
       prevItemsRef.current = next;
       setItems(next);
       setLoadState('ready');
-      writeApodCache(next);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setLoadState('error');
