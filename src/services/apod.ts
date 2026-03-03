@@ -32,15 +32,15 @@ export function readApodCache(cacheTtl: number): ApodItem[] | null {
     if (!raw) return null;
     const entry: CacheEntry = JSON.parse(raw);
     if (entry.utcDate !== todayUtc()) {
-      console.log('[APOD Cache] Miss — UTC date rolled over');
+      console.log('[APOD][Cache] Miss — UTC date rolled over');
       return null;
     }
     const ageSeconds = (Date.now() - entry.timestamp) / 1000;
     if (ageSeconds > cacheTtl) {
-      console.log(`[APOD Cache] Miss — TTL expired (age ${ageSeconds.toFixed(0)}s > ${cacheTtl}s)`);
+      console.log(`[APOD][Cache] Miss — TTL expired (age ${ageSeconds.toFixed(0)}s > ${cacheTtl}s)`);
       return null;
     }
-    console.log(`[APOD Cache] Hit — age ${ageSeconds.toFixed(0)}s, ${entry.items.length} items`);
+    console.log(`[APOD][Cache] Hit — age ${ageSeconds.toFixed(0)}s, ${entry.items.length} items`);
     return entry.items;
   } catch {
     return null;
@@ -56,10 +56,10 @@ export function writeApodCache(items: ApodItem[]): void {
       utcDate: todayUtc(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
-    console.log(`[APOD Cache] Written — ${items.length} items, TTL starts now`);
+    console.log(`[APOD][Cache] Written — ${items.length} items, TTL starts now`);
   } catch (e) {
     // localStorage may be unavailable (private browsing quota) — non-fatal.
-    console.warn('[APOD Cache] Write failed:', e);
+    console.warn('[APOD][Cache] Write failed:', e);
   }
 }
 

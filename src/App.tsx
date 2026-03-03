@@ -9,7 +9,7 @@ import './App.css';
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale } = useUrlParams();
+  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows } = useUrlParams();
 
   // Inject overlay text scale as a CSS custom property on the root element
   useEffect(() => {
@@ -24,17 +24,21 @@ export default function App() {
   // Track previous items so we can log replacements
   const prevItemsRef = useRef<ApodItem[]>([]);
 
+  const total = cols * rows;
+  const randomsNeeded = total - 1;
+
   const loadApods = useCallback(async () => {
     // Only show the full loading screen on the very first load (no items yet).
     // On subsequent refreshes keep the existing grid visible.
     if (prevItemsRef.current.length === 0) {
       setLoadState('loading');
     }
-    console.log('[App] loadApods triggered — apiKey suffix:', apiKey.slice(-4), '— cacheTtl:', cacheTtl);
+    console.log('[APOD][App] loadApods triggered — apiKey suffix:', apiKey.slice(-4), '— cacheTtl:', cacheTtl);
 
     // ── Cache read ──────────────────────────────────────────────────
     const cached = readApodCache(cacheTtl);
-    if (cached) {
+    // Discard cache if it was built for a different grid size
+    if (cached && cached.length === total) {
       prevItemsRef.current = cached;
       setItems(cached);
       setLoadState('ready');
@@ -44,10 +48,10 @@ export default function App() {
     try {
       const [today, candidates] = await Promise.all([
         fetchTodayApod(apiKey),
-        fetchRandomApods(apiKey, 3),
+        fetchRandomApods(apiKey, randomsNeeded),
       ]);
 
-      // Build a deduplicated list of 3 random items (excluding today)
+      // Build a deduplicated list of randomsNeeded items (excluding today)
       const seen = new Set([today.date]);
       const randoms: ApodItem[] = [];
       for (const c of candidates) {
@@ -55,19 +59,19 @@ export default function App() {
           seen.add(c.date);
           randoms.push(c);
         }
-        if (randoms.length === 3) break;
+        if (randoms.length === randomsNeeded) break;
       }
 
       // If still short, today's date collided with a random, top up
-      if (randoms.length < 3) {
-        console.warn(`[App] Deduplication collision — fetching ${3 - randoms.length} extra APODs`);
-        const extra = await fetchRandomApods(apiKey, 3);
+      if (randoms.length < randomsNeeded) {
+        console.warn(`[APOD][App] Deduplication collision — fetching ${randomsNeeded - randoms.length} extra APODs`);
+        const extra = await fetchRandomApods(apiKey, randomsNeeded);
         for (const c of extra) {
           if (!seen.has(c.date)) {
             seen.add(c.date);
             randoms.push(c);
           }
-          if (randoms.length === 3) break;
+          if (randoms.length === randomsNeeded) break;
         }
       }
 
@@ -79,7 +83,7 @@ export default function App() {
         next.forEach((item, i) => {
           if (prev[i] && prev[i].date !== item.date) {
             console.log(
-              `[App] Grid slot ${i} replaced:`,
+              `[APOD][App] Grid slot ${i} replaced:`,
               `"${prev[i].title}" (${prev[i].date})`,
               '→',
               `"${item.title}" (${item.date})`,
@@ -96,7 +100,7 @@ export default function App() {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setLoadState('error');
     }
-  }, [apiKey, cacheTtl]);
+  }, [apiKey, cacheTtl, total]);
 
   // Initial load
   useEffect(() => {
@@ -106,7 +110,7 @@ export default function App() {
   // Auto-refresh
   useEffect(() => {
     if (refreshInterval <= 0) return;
-    console.log(`[App] Auto-refresh enabled every ${refreshInterval}s`);
+    console.log(`[APOD][App] Auto-refresh enabled every ${refreshInterval}s`);
     const id = setInterval(loadApods, refreshInterval * 1000);
     return () => clearInterval(id);
   }, [loadApods, refreshInterval]);
@@ -139,6 +143,8 @@ export default function App() {
         items={items}
         overlay={overlay}
         fit={fit}
+        cols={cols}
+        rows={rows}
         onCardClick={setSelectedItem}
       />
       {selectedItem && (

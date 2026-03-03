@@ -20,6 +20,16 @@ export interface UrlParams {
    * Clamped to [0.5, 4.0].
    */
   textScale: number;
+  /**
+   * Number of grid columns. Defaults to 2.
+   * Clamped to 1-100. Product cols*rows is capped at 100.
+   */
+  cols: number;
+  /**
+   * Number of grid rows. Defaults to 2.
+   * Clamped to 1-100. Product cols*rows is capped at 100.
+   */
+  rows: number;
 }
 
 /**
@@ -32,6 +42,8 @@ export interface UrlParams {
  *   &fit=cover|contain          — image scaling (default: cover)
  *   &cache=3600                 — localStorage cache TTL in seconds (default: 3600, 0 = off)
  *   &text_scale=1.5             — overlay text size multiplier (default: 1.0, range 0.5–4.0)
+ *   &cols=2                     — number of grid columns (default: 2, min 1, max 100, product capped at 100)
+ *   &rows=2                     — number of grid rows (default: 2, min 1, max 100, product capped at 100)
  *
  * Example:
  *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
@@ -72,5 +84,27 @@ export function useUrlParams(): UrlParams {
       ? Math.min(4.0, Math.max(0.5, parseFloat(textScaleRaw)))
       : 1.0;
 
-  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale };
+  const colsRaw = params.get('cols');
+  let cols =
+    colsRaw !== null && !isNaN(Number(colsRaw)) && Number.isInteger(Number(colsRaw))
+      ? Math.min(100, Math.max(1, parseInt(colsRaw, 10)))
+      : 2;
+
+  const rowsRaw = params.get('rows');
+  let rows =
+    rowsRaw !== null && !isNaN(Number(rowsRaw)) && Number.isInteger(Number(rowsRaw))
+      ? Math.min(100, Math.max(1, parseInt(rowsRaw, 10)))
+      : 2;
+
+  // Cap the total cell count at 100 (NASA APOD API limit)
+  if (cols * rows > 100) {
+    const originalRows = rows;
+    rows = Math.floor(100 / cols);
+    console.warn(
+      `[APOD][useUrlParams] Grid size ${cols}x${originalRows} exceeds 100 cells; ` +
+      `clamped to ${cols}x${rows}`
+    );
+  }
+
+  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows };
 }

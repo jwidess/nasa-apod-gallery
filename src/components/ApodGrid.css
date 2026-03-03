@@ -1,7 +1,6 @@
 .apod-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  /* grid-template-columns and grid-template-rows are set via inline style in ApodGrid.tsx */
   width: 100vw;
   height: 100dvh; /* dynamic viewport height — handles mobile browser bars */
   overflow: hidden;
