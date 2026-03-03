@@ -4,16 +4,18 @@ import { fetchTodayApod, fetchRandomApods, readTodayCache, writeTodayCache, read
 import type { ApodItem } from './types/apod';
 import ApodGrid from './components/ApodGrid';
 import ApodModal from './components/ApodModal';
+import GalleryTitle from './components/GalleryTitle';
 import './App.css';
 
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows } = useUrlParams();
+  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle } = useUrlParams();
 
   // Inject overlay text scale as a CSS custom property on the root element
   useEffect(() => {
     document.documentElement.style.setProperty('--overlay-text-scale', String(textScale));
+    document.documentElement.style.setProperty('--gallery-title-scale', String(textScale));
   }, [textScale]);
 
   const [items, setItems] = useState<ApodItem[]>([]);
@@ -155,6 +157,7 @@ export default function App() {
         rows={rows}
         onCardClick={setSelectedItem}
       />
+      {showTitle && <GalleryTitle />}
       {selectedItem && (
         <ApodModal item={selectedItem} onClose={() => setSelectedItem(null)} />
       )}

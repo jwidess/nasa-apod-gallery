@@ -30,6 +30,7 @@ All parameters are optional, however an API key is required to avoid rate limits
 | `text_scale` | `1.0` | Overlay text size multiplier. `1.5` = 50% larger, `2.0` = double size, etc. Clamped to `0.5`–`4.0`. Useful for large TVs or high DPI displays. |
 | `cols` | `2` | Number of grid columns. Min 1, max 100; total cells (cols*rows) capped at 100. |
 | `rows` | `2` | Number of grid rows. Min 1, max 100; total cells (cols*rows) capped at 100. |
+| `show_title` | `1` | Show floating "NASA APOD Gallery" badge (set to `0` to hide). |
 
 ### Examples
 

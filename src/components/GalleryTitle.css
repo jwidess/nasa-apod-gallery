@@ -1,0 +1,51 @@
+/* ── Floating gallery title badge ──────────────────────────── */
+
+.gallery-title {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  /* Frosted-glass pill */
+  padding: 6px 16px 6px 8px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+
+  /* Subtle breathing animation */
+  animation: badge-breathe 5s ease-in-out infinite;
+
+  /* Don't interfere with clicks on grid cards */
+  pointer-events: none;
+  user-select: none;
+}
+
+.gallery-title__logo {
+  height: calc(30px * var(--gallery-title-scale, 1));
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+  flex-shrink: 0;
+}
+
+.gallery-title__text {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: calc(0.78rem * var(--gallery-title-scale, 1));
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+@keyframes badge-breathe {
+  0%, 100% { opacity: 0.80; }
+  50%       { opacity: 1.00; }
+}

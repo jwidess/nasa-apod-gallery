@@ -30,6 +30,11 @@ export interface UrlParams {
    * Clamped to 1-100. Product cols*rows is capped at 100.
    */
   rows: number;
+  /**
+   * Whether to show the floating "NASA APOD Gallery" title badge.
+   * Default: true
+   */
+  showTitle: boolean;
 }
 
 /**
@@ -44,6 +49,7 @@ export interface UrlParams {
  *   &text_scale=1.5             — overlay text size multiplier (default: 1.0, range 0.5–4.0)
  *   &cols=2                     — number of grid columns (default: 2, min 1, max 100, product capped at 100)
  *   &rows=2                     — number of grid rows (default: 2, min 1, max 100, product capped at 100)
+ *   &show_title=1               — show floating "NASA APOD Gallery" title badge (default: shown) or 0 to hide
  *
  * Example:
  *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
@@ -106,5 +112,8 @@ export function useUrlParams(): UrlParams {
     );
   }
 
-  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows };
+  // default to true when param absent
+  const showTitle = params.get('show_title') !== '0';
+
+  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle };
 }
