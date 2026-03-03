@@ -22,6 +22,12 @@ function getYoutubeId(url: string): string | null {
   return null;
 }
 
+/** Extract a Vimeo video ID from player or standard Vimeo URLs. */
+function getVimeoId(url: string): string | null {
+  const match = url.match(/vimeo\.com\/(?:video\/|)(\d+)/);
+  return match ? match[1] : null;
+}
+
 /** True if the URL looks like a directly-hosted video file. */
 function isDirectVideoUrl(url: string): boolean {
   return /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url);
@@ -61,6 +67,28 @@ export default function ApodCard({
         `https://www.youtube.com/embed/${youtubeId}` +
         `?autoplay=1&mute=1&loop=1&playlist=${youtubeId}` +
         `&controls=0&rel=0&modestbranding=1&playsinline=1`;
+
+      return (
+        <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen} title="Click for details">
+          <iframe
+            src={embedSrc}
+            title={item.title}
+            allow="autoplay; fullscreen; picture-in-picture"
+            className="apod-video"
+          />
+          <div className="apod-card__click-shield" aria-hidden="true" />
+          {renderOverlay()}
+        </div>
+      );
+    }
+
+    // ── Vimeo embed ─────────────────────────────────────────
+    const vimeoId = getVimeoId(item.url);
+    if (vimeoId) {
+      // background=1 enables Vimeo's background mode: autoplay, muted, looping, no controls
+      const embedSrc =
+        `https://player.vimeo.com/video/${vimeoId}` +
+        `?autoplay=1&autopause=0&muted=1&loop=1&background=1`;
 
       return (
         <div className="apod-card apod-card--video apod-card--clickable" onClick={onOpen} title="Click for details">

@@ -71,6 +71,7 @@ export function getGridImageProps(item: ApodItem): { src: string; srcSet?: strin
 export function getMediaFormat(item: ApodItem): string {
   if (item.media_type === 'video') {
     if (/youtube\.com|youtu\.be/i.test(item.url)) return 'YouTube';
+    if (/vimeo\.com/i.test(item.url)) return 'Vimeo';
     const vidMatch = item.url.match(/\.(mp4|webm|ogg|mov)(\?.*)?$/i);
     return vidMatch ? vidMatch[1].toUpperCase() : 'Video';
   }
