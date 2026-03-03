@@ -9,7 +9,12 @@ import './App.css';
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { apiKey, refreshInterval, overlay, fit, cacheTtl } = useUrlParams();
+  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale } = useUrlParams();
+
+  // Inject overlay text scale as a CSS custom property on the root element
+  useEffect(() => {
+    document.documentElement.style.setProperty('--overlay-text-scale', String(textScale));
+  }, [textScale]);
 
   const [items, setItems] = useState<ApodItem[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');

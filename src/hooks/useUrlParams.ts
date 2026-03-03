@@ -15,6 +15,11 @@ export interface UrlParams {
    * Defaults to 3600 (1 hour) when the parameter is absent.
    */
   cacheTtl: number;
+  /**
+   * Overlay text scale multiplier. 1.0 = default size.
+   * Clamped to [0.5, 4.0].
+   */
+  textScale: number;
 }
 
 /**
@@ -26,6 +31,7 @@ export interface UrlParams {
  *   &overlay=always|hover|none  — info overlay visibility (default: always)
  *   &fit=cover|contain          — image scaling (default: cover)
  *   &cache=3600                 — localStorage cache TTL in seconds (default: 3600, 0 = off)
+ *   &text_scale=1.5             — overlay text size multiplier (default: 1.0, range 0.5–4.0)
  *
  * Example:
  *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
@@ -60,5 +66,11 @@ export function useUrlParams(): UrlParams {
   // 0 = disabled; any positive value is clamped to a minimum of 10s to avoid API spam
   const cacheTtl = cacheParsed === 0 ? 0 : Math.max(10, cacheParsed);
 
-  return { apiKey, refreshInterval, overlay, fit, cacheTtl };
+  const textScaleRaw = params.get('text_scale');
+  const textScale =
+    textScaleRaw !== null && !isNaN(Number(textScaleRaw))
+      ? Math.min(4.0, Math.max(0.5, parseFloat(textScaleRaw)))
+      : 1.0;
+
+  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale };
 }

@@ -27,6 +27,7 @@ All parameters are optional. Combine them freely:
 | `overlay` | `always` | Info overlay visibility: `always`, `hover`, or `none` |
 | `fit` | `cover` | Image scaling: `cover` (fill cell, may crop) or `contain` (full image, black bars) |
 | `cache` | `3600` | localStorage cache TTL in **seconds**. Skips NASA API calls on page reload if the cache is fresh. `0` disables caching. Minimum `10` when non-zero. Cache is also invalidated when the UTC date changes (new day = new APOD). |
+| `text_scale` | `1.0` | Overlay text size multiplier. `1.5` = 50% larger, `2.0` = double size, etc. Clamped to `0.5`–`4.0`. Useful for large TVs or high DPI displays. |
 
 ### Examples
 
