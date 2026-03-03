@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUrlParams } from './hooks/useUrlParams';
-import { fetchTodayApod, fetchRandomApods } from './services/apod';
+import { fetchTodayApod, fetchRandomApods, readApodCache, writeApodCache } from './services/apod';
 import type { ApodItem } from './types/apod';
 import ApodGrid from './components/ApodGrid';
 import ApodModal from './components/ApodModal';
@@ -9,7 +9,7 @@ import './App.css';
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { apiKey, refreshInterval, overlay, fit } = useUrlParams();
+  const { apiKey, refreshInterval, overlay, fit, cacheTtl } = useUrlParams();
 
   const [items, setItems] = useState<ApodItem[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
@@ -25,7 +25,17 @@ export default function App() {
     if (prevItemsRef.current.length === 0) {
       setLoadState('loading');
     }
-    console.log('[App] loadApods triggered — apiKey suffix:', apiKey.slice(-4));
+    console.log('[App] loadApods triggered — apiKey suffix:', apiKey.slice(-4), '— cacheTtl:', cacheTtl);
+
+    // ── Cache read ──────────────────────────────────────────────────
+    const cached = readApodCache(cacheTtl);
+    if (cached) {
+      prevItemsRef.current = cached;
+      setItems(cached);
+      setLoadState('ready');
+      return;
+    }
+
     try {
       const [today, candidates] = await Promise.all([
         fetchTodayApod(apiKey),
@@ -76,11 +86,12 @@ export default function App() {
       prevItemsRef.current = next;
       setItems(next);
       setLoadState('ready');
+      writeApodCache(next);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setLoadState('error');
     }
-  }, [apiKey]);
+  }, [apiKey, cacheTtl]);
 
   // Initial load
   useEffect(() => {

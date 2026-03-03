@@ -10,16 +10,22 @@ export interface UrlParams {
   overlay: OverlayMode;
   /** CSS object-fit for images */
   fit: FitMode;
+  /**
+   * localStorage cache TTL in seconds. 0 = caching disabled.
+   * Defaults to 3600 (1 hour) when the parameter is absent.
+   */
+  cacheTtl: number;
 }
 
 /**
  * Reads display/behaviour config from the page URL query string.
  *
  * Supported parameters:
- *   ?api_key=YOUR_KEY        — NASA API key (default: DEMO_KEY)
- *   &refresh=3600            — auto-refresh every N seconds (default: 0, off)
+ *   ?api_key=YOUR_KEY           — NASA API key (default: DEMO_KEY)
+ *   &refresh=3600               — auto-refresh every N seconds (default: 0, off)
  *   &overlay=always|hover|none  — info overlay visibility (default: always)
- *   &fit=cover|contain       — image scaling (default: cover)
+ *   &fit=cover|contain          — image scaling (default: cover)
+ *   &cache=3600                 — localStorage cache TTL in seconds (default: 3600, 0 = off)
  *
  * Example:
  *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
@@ -30,10 +36,12 @@ export function useUrlParams(): UrlParams {
   const apiKey = params.get('api_key') || 'DEMO_KEY';
 
   const refreshRaw = params.get('refresh');
-  const refreshInterval =
+  const refreshParsed =
     refreshRaw !== null && !isNaN(Number(refreshRaw))
-      ? Math.max(0, parseInt(refreshRaw, 10))
+      ? parseInt(refreshRaw, 10)
       : 0;
+  // 0 = disabled; any positive value is clamped to a minimum of 10s to avoid API spam
+  const refreshInterval = refreshParsed === 0 ? 0 : Math.max(10, refreshParsed);
 
   const overlayRaw = params.get('overlay');
   const overlay: OverlayMode =
@@ -44,5 +52,13 @@ export function useUrlParams(): UrlParams {
   const fitRaw = params.get('fit');
   const fit: FitMode = fitRaw === 'contain' ? 'contain' : 'cover';
 
-  return { apiKey, refreshInterval, overlay, fit };
+  const cacheRaw = params.get('cache');
+  const cacheParsed =
+    cacheRaw !== null && !isNaN(Number(cacheRaw))
+      ? parseInt(cacheRaw, 10)
+      : 3600;
+  // 0 = disabled; any positive value is clamped to a minimum of 10s to avoid API spam
+  const cacheTtl = cacheParsed === 0 ? 0 : Math.max(10, cacheParsed);
+
+  return { apiKey, refreshInterval, overlay, fit, cacheTtl };
 }

@@ -1,6 +1,67 @@
 import type { ApodItem } from '../types/apod';
 
 const BASE_URL = 'https://api.nasa.gov/planetary/apod';
+const CACHE_KEY = 'apod_gallery_cache';
+
+interface CacheEntry {
+  items: ApodItem[];
+  /** Unix timestamp (ms) at which the entry was written. */
+  timestamp: number;
+  /** UTC date string (YYYY-MM-DD) when the entry was written. */
+  utcDate: string;
+}
+
+/** Current UTC date as "YYYY-MM-DD". */
+function todayUtc(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * Returns cached ApodItems if the cache is valid, otherwise null.
+ *
+ * Invalidated when:
+ *  - cacheTtl is 0 (disabled)
+ *  - Entry is missing or unparseable
+ *  - UTC date has rolled over (new day = new APOD available)
+ *  - Age exceeds cacheTtl
+ */
+export function readApodCache(cacheTtl: number): ApodItem[] | null {
+  if (cacheTtl <= 0) return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const entry: CacheEntry = JSON.parse(raw);
+    if (entry.utcDate !== todayUtc()) {
+      console.log('[APOD Cache] Miss — UTC date rolled over');
+      return null;
+    }
+    const ageSeconds = (Date.now() - entry.timestamp) / 1000;
+    if (ageSeconds > cacheTtl) {
+      console.log(`[APOD Cache] Miss — TTL expired (age ${ageSeconds.toFixed(0)}s > ${cacheTtl}s)`);
+      return null;
+    }
+    console.log(`[APOD Cache] Hit — age ${ageSeconds.toFixed(0)}s, ${entry.items.length} items`);
+    return entry.items;
+  } catch {
+    return null;
+  }
+}
+
+/** Persists fetched items to localStorage. */
+export function writeApodCache(items: ApodItem[]): void {
+  try {
+    const entry: CacheEntry = {
+      items,
+      timestamp: Date.now(),
+      utcDate: todayUtc(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(entry));
+    console.log(`[APOD Cache] Written — ${items.length} items, TTL starts now`);
+  } catch (e) {
+    // localStorage may be unavailable (private browsing quota) — non-fatal.
+    console.warn('[APOD Cache] Write failed:', e);
+  }
+}
 
 /**
  * Fetch today's APOD (single object response).

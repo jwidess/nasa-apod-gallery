@@ -23,9 +23,10 @@ All parameters are optional. Combine them freely:
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `api_key` | `DEMO_KEY` | Your [NASA API key](https://api.nasa.gov/#signUp). `DEMO_KEY` is rate-limited to 30 req/hr and 50 req/day per IP. |
-| `refresh` | `0` (off) | Auto-refresh interval in **seconds**. `0` disables auto-refresh. |
+| `refresh` | `0` (off) | Auto-refresh interval in **seconds**. `0` disables auto-refresh. Minimum `10` when non-zero. Note: if `cache` TTL is longer than this interval, refreshes will serve the cached data until the TTL expires. |
 | `overlay` | `always` | Info overlay visibility: `always`, `hover`, or `none` |
 | `fit` | `cover` | Image scaling: `cover` (fill cell, may crop) or `contain` (full image, black bars) |
+| `cache` | `3600` | localStorage cache TTL in **seconds**. Skips NASA API calls on page reload if the cache is fresh. `0` disables caching. Minimum `10` when non-zero. Cache is also invalidated when the UTC date changes (new day = new APOD). |
 
 ### Examples
 
