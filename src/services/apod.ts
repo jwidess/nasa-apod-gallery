@@ -5,6 +5,8 @@ const BASE_URL = 'https://api.nasa.gov/planetary/apod';
 const TODAY_CACHE_KEY = 'apod_today_cache';
 const RANDOMS_CACHE_KEY = 'apod_randoms_cache';
 
+const CACHE_WRITE_GRACE_MS = 500;
+
 interface TodayCacheEntry {
   item: ApodItem;
   /** APOD date string (YYYY-MM-DD at UTC-4) when this was fetched. */
@@ -88,8 +90,8 @@ export function readRandomsCache(count: number, cacheTtl: number): ApodItem[] | 
       return null;
     }
     const ageSeconds = (Date.now() - entry.timestamp) / 1000;
-    if (ageSeconds > cacheTtl) {
-      console.log(`[APOD][Cache] Randoms miss — TTL expired (age ${ageSeconds.toFixed(0)}s > ${cacheTtl}s)`);
+    if (ageSeconds >= cacheTtl) {
+      console.log(`[APOD][Cache] Randoms miss — TTL expired (age ${ageSeconds.toFixed(0)}s ≥ ${cacheTtl}s)`);
       return null;
     }
     if (entry.items.length !== count) {
@@ -105,7 +107,7 @@ export function readRandomsCache(count: number, cacheTtl: number): ApodItem[] | 
 
 export function writeRandomsCache(items: ApodItem[]): void {
   try {
-    const entry: RandomsCacheEntry = { items, timestamp: Date.now(), apodDate: apodDate() };
+    const entry: RandomsCacheEntry = { items, timestamp: Date.now() - CACHE_WRITE_GRACE_MS, apodDate: apodDate() };
     localStorage.setItem(RANDOMS_CACHE_KEY, JSON.stringify(entry));
     console.log(`[APOD][Cache] Randoms written — ${items.length} items, TTL starts now`);
   } catch (e) {
