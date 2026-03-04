@@ -98,7 +98,12 @@ export default function ApodModal({ item, onClose }: ApodModalProps) {
         {/* Info body */}
         <div className="modal-body">
           <div className="modal-header">
-            <h2 className="modal-title">{item.title}</h2>
+            <div className="modal-header__top">
+              <h2 className="modal-title">{item.title}</h2>
+              {item.copyright && (
+                <span className="modal-copyright">© {item.copyright}</span>
+              )}
+            </div>
             <div className="modal-header__meta">
               <span className="modal-format-badge">{mediaFormat}</span>
               <span className="modal-date">{item.date}</span>
@@ -152,9 +157,6 @@ export default function ApodModal({ item, onClose }: ApodModalProps) {
             )}
           </div>
 
-          {item.copyright && (
-            <p className="modal-copyright">© {item.copyright}</p>
-          )}
         </div>
       </div>
     </div>

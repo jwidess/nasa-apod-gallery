@@ -137,6 +137,19 @@
   margin-bottom: 12px;
 }
 
+.modal-header__top {
+  display: flex;
+  align-items: baseline; /* align bottoms of title and copyright */
+  gap: 0.6rem; /* small space between title and copyright */
+}
+
+.modal-copyright {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.8rem;
+  margin-left: 0.3rem; /* extra padding from title if needed */
+  flex-shrink: 0;
+}
+
 .modal-title {
   color: #fff;
   font-size: clamp(1rem, 2.2vw, 1.4rem);
