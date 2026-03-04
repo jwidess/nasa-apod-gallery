@@ -5,13 +5,18 @@
   top: 16px;
   right: 16px;
   z-index: 50;
+  --gallery-title-orbit-radius: 22px;
+  /* horizontal offset applied to orbit center; positive moves right */
+  --gallery-title-orbit-center-x: -1px;
+  /* vertical offset applied to orbit center; positive moves down */
+  --gallery-title-orbit-center-y: -1px;
 
   display: flex;
   align-items: center;
   gap: 9px;
 
   /* Frosted-glass pill */
-  padding: 6px 16px 6px 8px;
+  padding: 10px 16px 8px 10px;
   border-radius: 999px;
   background: rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(10px);
@@ -20,7 +25,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
 
   /* Subtle breathing animation */
-  animation: badge-breathe 4s ease-in-out infinite;
+  animation: badge-breathe 5s ease-in-out infinite;
 
   /* Don't interfere with clicks on grid cards */
   pointer-events: none;
@@ -35,9 +40,29 @@
   flex-shrink: 0;
 }
 
+.gallery-title__logo-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-title__orbit-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  top: calc(50% + var(--gallery-title-orbit-center-y) * var(--gallery-title-scale, 1));
+  left: calc(50% + var(--gallery-title-orbit-center-x) * var(--gallery-title-scale, 1));
+  transform: translate(-50%, -50%) rotate(0deg) translateX(calc(var(--gallery-title-orbit-radius) * var(--gallery-title-scale, 1)));
+  animation: gallery-title-orbit 9s linear infinite;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+}
+
 .gallery-title__text {
   color: rgba(255, 255, 255, 0.95);
-  font-size: calc(0.9rem * var(--gallery-title-scale, 1));
+  font-size: calc(1rem * var(--gallery-title-scale, 1));
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -48,4 +73,13 @@
 @keyframes badge-breathe {
   0%, 100% { opacity: 0.75; }
   50%       { opacity: 1.00; }
+}
+
+@keyframes gallery-title-orbit {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(calc(var(--gallery-title-orbit-radius) * var(--gallery-title-scale, 1)));
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(calc(var(--gallery-title-orbit-radius) * var(--gallery-title-scale, 1)));
+  }
 }
