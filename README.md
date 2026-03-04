@@ -4,9 +4,11 @@ A full page gallery of NASA [Astronomy Picture of the Day](https://apod.nasa.gov
 
 - **Top-left cell** shows today's APOD
 - **Other cells** show randomly selected past APODs
-- Set grid scales dynamically to any display size or aspect ratio
+- Configured grid size scales dynamically to any display size or aspect ratio
 - Videos play muted and looping
 - Configurable via URL parameters
+
+![React 19](https://img.shields.io/badge/React-19.2-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![Vite](https://img.shields.io/badge/Vite-7.3-purple)
 
 ## Live Demo
 
@@ -32,17 +34,17 @@ All parameters are optional, however an API key is required to avoid rate limits
 | `rows` | `2` | Number of grid rows. Min 1, max 100; total cells (cols*rows) capped at 100. |
 | `show_title` | `1` | Show floating "NASA APOD Gallery" badge (set to `0` to hide). |
 
-### Examples
+### Example URLs
 
 ```
-# Personal API key, refresh every hour, hover-only overlay
-https://jwidess.github.io/nasa-apod-gallery/?api_key=YOUR_KEY&refresh=3600&overlay=hover
+# Personal API key, refresh every hour, 3x2 grid
+https://jwidess.github.io/nasa-apod-gallery/?api_key=YOUR_KEY&refresh=3600&cols=3&rows=2
 
 # TV wallpaper - no overlay, refresh every 30 minutes
-https://jwidess.github.io/nasa-apod-gallery/?api_key=YOUR_KEY&refresh=1800&overlay=none
+https://jwidess.github.io/nasa-apod-gallery/?api_key=YOUR_KEY&refresh=1800&cache=1800&overlay=none
 
 # Contain mode to see full images without cropping
-https://jwidess.github.io/nasa-apod-gallery/?fit=contain&overlay=always
+https://jwidess.github.io/nasa-apod-gallery/?api_key=YOUR_KEY&fit=contain
 ```
 
 ## Getting a Free NASA API Key
@@ -54,6 +56,9 @@ Register at [https://api.nasa.gov/#signUp](https://api.nasa.gov/#signUp) to get 
 - [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite 7](https://vite.dev/)
 - NASA [APOD API](https://github.com/nasa/apod-api)
+
+## AI Disclaimer: 
+This project was developed with significant work from AI code generation tools, as I am still new to web development. However, I have done much testing across multiple machines and displays of different resolutions and DPI to verify that the gallery functions and renders appropriately.
 
 ## License
 
