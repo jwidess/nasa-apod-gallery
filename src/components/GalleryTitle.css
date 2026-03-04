@@ -20,7 +20,7 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
 
   /* Subtle breathing animation */
-  animation: badge-breathe 5s ease-in-out infinite;
+  animation: badge-breathe 4s ease-in-out infinite;
 
   /* Don't interfere with clicks on grid cards */
   pointer-events: none;
@@ -28,7 +28,7 @@
 }
 
 .gallery-title__logo {
-  height: calc(30px * var(--gallery-title-scale, 1));
+  height: calc(35px * var(--gallery-title-scale, 1));
   width: auto;
   display: block;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
@@ -36,9 +36,9 @@
 }
 
 .gallery-title__text {
-  color: rgba(255, 255, 255, 0.92);
-  font-size: calc(0.78rem * var(--gallery-title-scale, 1));
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: calc(0.9rem * var(--gallery-title-scale, 1));
+  font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -46,6 +46,6 @@
 }
 
 @keyframes badge-breathe {
-  0%, 100% { opacity: 0.80; }
+  0%, 100% { opacity: 0.75; }
   50%       { opacity: 1.00; }
 }
