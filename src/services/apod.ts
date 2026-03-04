@@ -9,7 +9,7 @@ const CACHE_WRITE_GRACE_MS = 500;
 
 interface TodayCacheEntry {
   item: ApodItem;
-  /** APOD date string (YYYY-MM-DD at UTC-4) when this was fetched. */
+  /** APOD calendar date (YYYY-MM-DD, America/New_York timezone) when this was fetched. */
   apodDate: string;
 }
 
@@ -17,20 +17,18 @@ interface RandomsCacheEntry {
   items: ApodItem[];
   /** Unix timestamp (ms) at which the entry was written. */
   timestamp: number;
-  /** APOD date string (YYYY-MM-DD at UTC-4) when this was fetched. */
+  /** APOD calendar date (YYYY-MM-DD, America/New_York timezone) when this was fetched. */
   apodDate: string;
 }
 
 /**
  * Current APOD calendar date as "YYYY-MM-DD".
  *
- * NASA publishes new APODs at 00:00 Eastern Time (UTC-4 standard/UTC-5 DST).
- * We use a fixed UTC-4 offset, screw DST!
- * https://github.com/nasa/apod-api/issues/26
+ * NASA publishes new APODs at 00:00 Eastern Time. Using the IANA timezone
+ * identifier handles both EST (UTC-5) and EDT (UTC-4) automatically.
  */
 function apodDate(): string {
-  const et = new Date(Date.now() - 4 * 60 * 60 * 1000);
-  return et.toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
 }
 
 // ── Today's APOD cache ────────────────────────────────────────────────────────
@@ -48,6 +46,12 @@ export function readTodayCache(): ApodItem | null {
     const entry: TodayCacheEntry = JSON.parse(raw);
     if (entry.apodDate !== apodDate()) {
       console.log('[APOD][Cache] Today miss — APOD date rolled over');
+      return null;
+    }
+    // Guard against a bad cache where the fetched item pre-dates the
+    // expected APOD date (e.g. cached just before midnight with a bad clock offset)
+    if (entry.item.date !== apodDate()) {
+      console.log(`[APOD][Cache] Today miss — cached item date (${entry.item.date}) doesn't match expected APOD date (${apodDate()})`);
       return null;
     }
     console.log(`[APOD][Cache] Today hit — ${entry.item.date} "${entry.item.title}"`);
