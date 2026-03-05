@@ -10,13 +10,13 @@ A full page gallery of NASA [Astronomy Picture of the Day](https://apod.nasa.gov
 
 ![React 19](https://img.shields.io/badge/React-19.2-blue) ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue) ![Vite](https://img.shields.io/badge/Vite-7.3-purple)
 
-## Live Demo
+
 
 > [!NOTE]
-> View the live demo here: [https://jwidess.github.io/nasa-apod-gallery/](https://jwidess.github.io/nasa-apod-gallery/)
+> **View the live page here:** [https://jwidess.github.io/nasa-apod-gallery/](https://jwidess.github.io/nasa-apod-gallery/)
 
-## Example Image
-![Example screenshot of the gallery](example.png)
+## Example
+![Example gallery animation](example.gif)
 
 ## URL Parameters
 
