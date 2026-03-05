@@ -49,15 +49,15 @@
 
 .gallery-title__orbit-dot {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: calc(6px * var(--gallery-title-scale, 1));
+  height: calc(6px * var(--gallery-title-scale, 1));
   border-radius: 50%;
   background: #fff;
   top: calc(50% + var(--gallery-title-orbit-center-y) * var(--gallery-title-scale, 1));
   left: calc(50% + var(--gallery-title-orbit-center-x) * var(--gallery-title-scale, 1));
   transform: translate(-50%, -50%) rotate(0deg) translateX(calc(var(--gallery-title-orbit-radius) * var(--gallery-title-scale, 1)));
   animation: gallery-title-orbit 9s linear infinite;
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 calc(6px * var(--gallery-title-scale, 1)) rgba(255, 255, 255, 0.85);
 }
 
 .gallery-title__text {
