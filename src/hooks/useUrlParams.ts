@@ -2,8 +2,6 @@ export type OverlayMode = 'always' | 'hover' | 'none';
 export type FitMode = 'cover' | 'contain';
 
 export interface UrlParams {
-  /** NASA API key — defaults to DEMO_KEY */
-  apiKey: string;
   /** Auto-refresh interval in seconds. 0 = disabled. */
   refreshInterval: number;
   /** Controls when the info overlay is visible */
@@ -41,7 +39,6 @@ export interface UrlParams {
  * Reads display/behaviour config from the page URL query string.
  *
  * Supported parameters:
- *   ?api_key=YOUR_KEY           — NASA API key (default: DEMO_KEY)
  *   &refresh=3600               — auto-refresh every N seconds (default: 0, off)
  *   &overlay=always|hover|none  — info overlay visibility (default: always)
  *   &fit=cover|contain          — image scaling (default: cover)
@@ -52,12 +49,10 @@ export interface UrlParams {
  *   &show_title=1               — show floating "NASA APOD Gallery" title badge (default: shown) or 0 to hide
  *
  * Example:
- *   https://jwidess.github.io/nasa-apod-gallery/?api_key=ABC123&refresh=3600&overlay=hover&fit=cover
+ *   https://jwidess.github.io/nasa-apod-gallery/?refresh=3600&overlay=hover&fit=cover
  */
 export function useUrlParams(): UrlParams {
   const params = new URLSearchParams(window.location.search);
-
-  const apiKey = params.get('api_key') || 'DEMO_KEY';
 
   const refreshRaw = params.get('refresh');
   const refreshParsed =
@@ -102,7 +97,9 @@ export function useUrlParams(): UrlParams {
       ? Math.min(100, Math.max(1, parseInt(rowsRaw, 10)))
       : 2;
 
-  // Cap the total cell count at 100 (NASA APOD API limit)
+  // Cap the total cell count at 100
+  // (This was a limitation of the original NASA APOD API, but we'll keep it as
+  // a safeguard against excessive memory usage for now)
   if (cols * rows > 100) {
     const originalRows = rows;
     rows = Math.floor(100 / cols);
@@ -115,5 +112,5 @@ export function useUrlParams(): UrlParams {
   // default to true when param absent
   const showTitle = params.get('show_title') !== '0';
 
-  return { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle };
+  return { refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle };
 }
