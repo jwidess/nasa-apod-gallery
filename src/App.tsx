@@ -10,7 +10,7 @@ import './App.css';
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { apiKey, refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle } = useUrlParams();
+  const { refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle } = useUrlParams();
 
   // Inject overlay text scale as a CSS custom property on the root element
   useEffect(() => {
@@ -35,13 +35,13 @@ export default function App() {
     if (prevItemsRef.current.length === 0) {
       setLoadState('loading');
     }
-    console.log('[APOD][App] loadApods triggered — apiKey suffix:', apiKey.slice(-4), '— cacheTtl:', cacheTtl);
+    console.log('[APOD][App] loadApods triggered — cacheTtl:', cacheTtl);
 
     try {
       // ── Today's APOD — only re-fetched when the APOD date rolls over ────────
       let today: ApodItem | null = readTodayCache();
       if (!today) {
-        today = await fetchTodayApod(apiKey);
+        today = await fetchTodayApod();
         writeTodayCache(today);
       }
 
@@ -58,7 +58,7 @@ export default function App() {
       // ── Randoms — re-fetched on TTL expiry or APOD date rollover ────────────
       let randoms: ApodItem[] | null = readRandomsCache(randomsNeeded, cacheTtl);
       if (!randoms) {
-        const candidates = await fetchRandomApods(apiKey, randomsNeeded);
+        const candidates = await fetchRandomApods(randomsNeeded);
 
         const seen = new Set([today.date]);
         randoms = [];
@@ -73,7 +73,7 @@ export default function App() {
         // If still short, today's date collided with a random, top up
         if (randoms.length < randomsNeeded) {
           console.warn(`[APOD][App] Deduplication collision — fetching ${randomsNeeded - randoms.length} extra APODs`);
-          const extra = await fetchRandomApods(apiKey, randomsNeeded);
+          const extra = await fetchRandomApods(randomsNeeded);
           for (const c of extra) {
             if (!seen.has(c.date)) {
               seen.add(c.date);
@@ -110,7 +110,7 @@ export default function App() {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setLoadState('error');
     }
-  }, [apiKey, cacheTtl, total]);
+  }, [cacheTtl, total]);
 
   // Initial load
   useEffect(() => {

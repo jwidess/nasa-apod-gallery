@@ -1,6 +1,6 @@
 import type { ApodItem } from '../types/apod';
 
-const BASE_URL = 'https://api.nasa.gov/planetary/apod';
+const BASE_URL = 'https://apod.ellanan.com/api';
 
 const TODAY_CACHE_KEY = 'apod_today_cache';
 const RANDOMS_CACHE_KEY = 'apod_randoms_cache';
@@ -122,9 +122,9 @@ export function writeRandomsCache(items: ApodItem[]): void {
 // ── API fetch helpers ─────────────────────────────────────────────────────────
 
 /** Fetch today's APOD (single object response). */
-export async function fetchTodayApod(apiKey: string): Promise<ApodItem> {
-  const url = `${BASE_URL}?api_key=${encodeURIComponent(apiKey)}&thumbs=true`;
-  console.log('[APOD] Fetching today\'s APOD →', url.replace(encodeURIComponent(apiKey), '<api_key>'));
+export async function fetchTodayApod(): Promise<ApodItem> {
+  const url = BASE_URL;
+  console.log('[APOD] Fetching today\'s APOD →', url);
   const t0 = performance.now();
   const response = await fetch(url);
   if (!response.ok) {
@@ -141,14 +141,14 @@ export async function fetchTodayApod(apiKey: string): Promise<ApodItem> {
 }
 
 /** Fetch N randomly selected past APODs (array response). */
-export async function fetchRandomApods(apiKey: string, count: number): Promise<ApodItem[]> {
+export async function fetchRandomApods(count: number): Promise<ApodItem[]> {
   if (count <= 0) {
     console.log('[APOD] fetchRandomApods skipped (count <= 0)');
     return [];
   }
 
-  const url = `${BASE_URL}?api_key=${encodeURIComponent(apiKey)}&count=${count}&thumbs=true`;
-  console.log(`[APOD] Fetching ${count} random APODs →`, url.replace(encodeURIComponent(apiKey), '<api_key>'));
+  const url = `${BASE_URL}?count=${count}`;
+  console.log(`[APOD] Fetching ${count} random APODs →`, url);
   const t0 = performance.now();
   const response = await fetch(url);
   if (!response.ok) {
