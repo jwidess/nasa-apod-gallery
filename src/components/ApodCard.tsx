@@ -9,6 +9,7 @@ interface ApodCardProps {
   overlay: OverlayMode;
   fit: FitMode;
   isPrimary?: boolean;
+  showTodayBadge?: boolean;
   onOpen: () => void;
 }
 
@@ -39,6 +40,7 @@ export default function ApodCard({
   overlay,
   fit,
   isPrimary = false,
+  showTodayBadge = true,
   onOpen,
 }: ApodCardProps) {
   // Detect GIFs so we can restart them periodically (every 15s)
@@ -65,7 +67,7 @@ export default function ApodCard({
 
   const renderOverlay = () => (
     <div className={overlayClass}>
-      {isPrimary && <span className="overlay__badge">Today</span>}
+      {isPrimary && showTodayBadge && <span className="overlay__badge">Today</span>}
       <span className="overlay__title">{item.title}</span>
       <span className="overlay__date">{item.date}</span>
       {item.copyright && (

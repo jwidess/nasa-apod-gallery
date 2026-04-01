@@ -10,10 +10,19 @@ interface ApodGridProps {
   fit: FitMode;
   cols: number;
   rows: number;
+  showTodayBadge?: boolean;
   onCardClick: (item: ApodItem) => void;
 }
 
-export default function ApodGrid({ items, overlay, fit, cols, rows, onCardClick }: ApodGridProps) {
+export default function ApodGrid({
+  items,
+  overlay,
+  fit,
+  cols,
+  rows,
+  showTodayBadge = true,
+  onCardClick,
+}: ApodGridProps) {
   const gridStyle: React.CSSProperties = {
     gridTemplateColumns: `repeat(${cols}, 1fr)`,
     gridTemplateRows: `repeat(${rows}, 1fr)`,
@@ -28,6 +37,7 @@ export default function ApodGrid({ items, overlay, fit, cols, rows, onCardClick 
           overlay={overlay}
           fit={fit}
           isPrimary={index === 0}
+          showTodayBadge={showTodayBadge}
           onOpen={() => onCardClick(item)}
         />
       ))}

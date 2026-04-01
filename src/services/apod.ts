@@ -31,6 +31,10 @@ function apodDate(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date());
 }
 
+function effectiveApodDate(apodDateOverride?: string): string {
+  return apodDateOverride ?? apodDate();
+}
+
 // ── Today's APOD cache ────────────────────────────────────────────────────────
 
 /**
@@ -39,19 +43,20 @@ function apodDate(): string {
  * Today's APOD is immutable for the rest of its day, so no TTL is applied. 
  * The entry is only evicted when the APOD date rolls over.
  */
-export function readTodayCache(): ApodItem | null {
+export function readTodayCache(apodDateOverride?: string): ApodItem | null {
   try {
     const raw = localStorage.getItem(TODAY_CACHE_KEY);
     if (!raw) return null;
     const entry: TodayCacheEntry = JSON.parse(raw);
-    if (entry.apodDate !== apodDate()) {
+    const expectedApodDate = effectiveApodDate(apodDateOverride);
+    if (entry.apodDate !== expectedApodDate) {
       console.log('[APOD][Cache] Today miss — APOD date rolled over');
       return null;
     }
     // Guard against a bad cache where the fetched item pre-dates the
     // expected APOD date (e.g. cached just before midnight with a bad clock offset)
-    if (entry.item.date !== apodDate()) {
-      console.log(`[APOD][Cache] Today miss — cached item date (${entry.item.date}) doesn't match expected APOD date (${apodDate()})`);
+    if (entry.item.date !== expectedApodDate) {
+      console.log(`[APOD][Cache] Today miss — cached item date (${entry.item.date}) doesn't match expected APOD date (${expectedApodDate})`);
       return null;
     }
     console.log(`[APOD][Cache] Today hit — ${entry.item.date} "${entry.item.title}"`);
@@ -61,9 +66,9 @@ export function readTodayCache(): ApodItem | null {
   }
 }
 
-export function writeTodayCache(item: ApodItem): void {
+export function writeTodayCache(item: ApodItem, apodDateOverride?: string): void {
   try {
-    const entry: TodayCacheEntry = { item, apodDate: apodDate() };
+    const entry: TodayCacheEntry = { item, apodDate: effectiveApodDate(apodDateOverride) };
     localStorage.setItem(TODAY_CACHE_KEY, JSON.stringify(entry));
     console.log(`[APOD][Cache] Today written — ${item.date} "${item.title}"`);
   } catch (e) {
@@ -83,13 +88,13 @@ export function writeTodayCache(item: ApodItem): void {
  *  - Age exceeds cacheTtl
  *  - Cached count doesn't match requested count (grid size changed)
  */
-export function readRandomsCache(count: number, cacheTtl: number): ApodItem[] | null {
+export function readRandomsCache(count: number, cacheTtl: number, apodDateOverride?: string): ApodItem[] | null {
   if (cacheTtl <= 0) return null;
   try {
     const raw = localStorage.getItem(RANDOMS_CACHE_KEY);
     if (!raw) return null;
     const entry: RandomsCacheEntry = JSON.parse(raw);
-    if (entry.apodDate !== apodDate()) {
+    if (entry.apodDate !== effectiveApodDate(apodDateOverride)) {
       console.log('[APOD][Cache] Randoms miss — APOD date rolled over');
       return null;
     }
@@ -109,9 +114,13 @@ export function readRandomsCache(count: number, cacheTtl: number): ApodItem[] | 
   }
 }
 
-export function writeRandomsCache(items: ApodItem[]): void {
+export function writeRandomsCache(items: ApodItem[], apodDateOverride?: string): void {
   try {
-    const entry: RandomsCacheEntry = { items, timestamp: Date.now() - CACHE_WRITE_GRACE_MS, apodDate: apodDate() };
+    const entry: RandomsCacheEntry = {
+      items,
+      timestamp: Date.now() - CACHE_WRITE_GRACE_MS,
+      apodDate: effectiveApodDate(apodDateOverride),
+    };
     localStorage.setItem(RANDOMS_CACHE_KEY, JSON.stringify(entry));
     console.log(`[APOD][Cache] Randoms written — ${items.length} items, TTL starts now`);
   } catch (e) {
@@ -122,8 +131,10 @@ export function writeRandomsCache(items: ApodItem[]): void {
 // ── API fetch helpers ─────────────────────────────────────────────────────────
 
 /** Fetch today's APOD (single object response). */
-export async function fetchTodayApod(): Promise<ApodItem> {
-  const url = BASE_URL;
+export async function fetchTodayApod(apodDateOverride?: string): Promise<ApodItem> {
+  const url = apodDateOverride
+    ? `${BASE_URL}?date=${encodeURIComponent(apodDateOverride)}`
+    : BASE_URL;
   console.log('[APOD] Fetching today\'s APOD →', url);
   const t0 = performance.now();
   const response = await fetch(url);

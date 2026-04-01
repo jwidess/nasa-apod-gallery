@@ -33,6 +33,24 @@ export interface UrlParams {
    * Default: true
    */
   showTitle: boolean;
+  /**
+   * Optional APOD date override (YYYY-MM-DD).
+   * When provided, this date is treated as "today" for the top-left APOD.
+   */
+  apodDateOverride: string | null;
+}
+
+function isValidApodDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const [y, m, d] = value.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+
+  return (
+    dt.getUTCFullYear() === y &&
+    dt.getUTCMonth() === m - 1 &&
+    dt.getUTCDate() === d
+  );
 }
 
 /**
@@ -47,6 +65,7 @@ export interface UrlParams {
  *   &cols=2                     — number of grid columns (default: 2, min 1, max 100, product capped at 100)
  *   &rows=2                     — number of grid rows (default: 2, min 1, max 100, product capped at 100)
  *   &show_title=1               — show floating "NASA APOD Gallery" title badge (default: shown) or 0 to hide
+ *   &apod_date=2025-03-02       — treat this APOD date as "today" (YYYY-MM-DD)
  *
  * Example:
  *   https://jwidess.github.io/nasa-apod-gallery/?refresh=3600&overlay=hover&fit=cover
@@ -112,5 +131,25 @@ export function useUrlParams(): UrlParams {
   // default to true when param absent
   const showTitle = params.get('show_title') !== '0';
 
-  return { refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle };
+  const apodDateRaw = params.get('apod_date');
+  const apodDateOverride =
+    apodDateRaw && isValidApodDate(apodDateRaw) ? apodDateRaw : null;
+
+  if (apodDateRaw && !apodDateOverride) {
+    console.warn(
+      `[APOD][useUrlParams] Ignoring invalid apod_date "${apodDateRaw}"; expected YYYY-MM-DD`
+    );
+  }
+
+  return {
+    refreshInterval,
+    overlay,
+    fit,
+    cacheTtl,
+    textScale,
+    cols,
+    rows,
+    showTitle,
+    apodDateOverride,
+  };
 }

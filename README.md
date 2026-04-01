@@ -34,6 +34,7 @@ All parameters are optional.
 | `cols` | `2` | Number of grid columns. Min 1, max 100; total cells (cols*rows) capped at 100. |
 | `rows` | `2` | Number of grid rows. Min 1, max 100; total cells (cols*rows) capped at 100. |
 | `show_title` | `1` | Show floating "NASA APOD Gallery" badge (set to `0` to hide). |
+| `apod_date` | _(unset)_ | Optional APOD date override in `YYYY-MM-DD` format. When set, this date is treated as "today" for the top-left APOD. |
 
 ### Example URLs
 
@@ -46,6 +47,9 @@ https://jwidess.github.io/nasa-apod-gallery/?refresh=1800&cache=1800&overlay=non
 
 # Contain mode to see full images without cropping
 https://jwidess.github.io/nasa-apod-gallery/?fit=contain
+
+# Pin the top-left APOD tile to a specific date
+https://jwidess.github.io/nasa-apod-gallery/?apod_date=2025-03-06
 ```
 
 ## API Source

@@ -10,7 +10,7 @@ import './App.css';
 type LoadState = 'loading' | 'error' | 'ready';
 
 export default function App() {
-  const { refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle } = useUrlParams();
+  const { refreshInterval, overlay, fit, cacheTtl, textScale, cols, rows, showTitle, apodDateOverride } = useUrlParams();
 
   // Inject overlay text scale as a CSS custom property on the root element
   useEffect(() => {
@@ -35,14 +35,14 @@ export default function App() {
     if (prevItemsRef.current.length === 0) {
       setLoadState('loading');
     }
-    console.log('[APOD][App] loadApods triggered — cacheTtl:', cacheTtl);
+    console.log('[APOD][App] loadApods triggered — cacheTtl:', cacheTtl, 'apodDateOverride:', apodDateOverride ?? 'none');
 
     try {
       // ── Today's APOD — only re-fetched when the APOD date rolls over ────────
-      let today: ApodItem | null = readTodayCache();
+      let today: ApodItem | null = readTodayCache(apodDateOverride ?? undefined);
       if (!today) {
-        today = await fetchTodayApod();
-        writeTodayCache(today);
+        today = await fetchTodayApod(apodDateOverride ?? undefined);
+        writeTodayCache(today, apodDateOverride ?? undefined);
       }
 
       if (randomsNeeded <= 0) {
@@ -56,7 +56,11 @@ export default function App() {
       }
 
       // ── Randoms — re-fetched on TTL expiry or APOD date rollover ────────────
-      let randoms: ApodItem[] | null = readRandomsCache(randomsNeeded, cacheTtl);
+      let randoms: ApodItem[] | null = readRandomsCache(
+        randomsNeeded,
+        cacheTtl,
+        apodDateOverride ?? undefined,
+      );
       if (!randoms) {
         const candidates = await fetchRandomApods(randomsNeeded);
 
@@ -83,7 +87,7 @@ export default function App() {
           }
         }
 
-        writeRandomsCache(randoms);
+        writeRandomsCache(randoms, apodDateOverride ?? undefined);
       }
 
       const next = [today, ...randoms];
@@ -110,7 +114,7 @@ export default function App() {
       setErrorMsg(err instanceof Error ? err.message : String(err));
       setLoadState('error');
     }
-  }, [cacheTtl, total]);
+  }, [cacheTtl, randomsNeeded, apodDateOverride]);
 
   // Initial load
   useEffect(() => {
@@ -155,6 +159,7 @@ export default function App() {
         fit={fit}
         cols={cols}
         rows={rows}
+        showTodayBadge={!apodDateOverride}
         onCardClick={setSelectedItem}
       />
       {showTitle && <GalleryTitle />}
