@@ -145,4 +145,8 @@
 .overlay__copyright {
   color: rgba(255, 255, 255, 0.42);
   font-size: calc(var(--overlay-text-scale, 1) * clamp(0.5rem, 0.8vw, 0.68rem));
+  /* Copyright on single line, ellipsis on overflow */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
